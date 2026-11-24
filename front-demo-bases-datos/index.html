@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mis Registros</title>
+  <style>
+    body {
+      background-color: #13151a;
+      color: #ffffff;
+      font-family: system-ui, sans-serif;
+      display: flex;
+      justify-content: center;
+      padding: 40px 20px;
+    }
+    .contenedor {
+      width: 100%;
+      max-width: 600px;
+    }
+    h1 { text-align: center; margin-bottom: 5px; }
+    .subtitulo { text-align: center; color: #9ca3af; margin-bottom: 30px; }
+    .caja-formulario {
+      background-color: #1e2128;
+      padding: 20px;
+      border-radius: 10px;
+      margin-bottom: 30px;
+    }
+    input, textarea {
+      width: 100%;
+      background-color: #13151a;
+      border: 1px solid #374151;
+      color: white;
+      padding: 12px;
+      border-radius: 6px;
+      margin-bottom: 12px;
+      box-sizing: border-box;
+    }
+    button {
+      background-color: #5865f2;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    button:hover { background-color: #4752c4; }
+    .tarjeta {
+      background-color: #1e2128;
+      padding: 15px 20px;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      border: 1px solid #2d3139;
+    }
+    .tarjeta h3 { margin: 0 0 5px 0; font-size: 16px; }
+    .tarjeta p { margin: 0; color: #9ca3af; font-size: 14px; }
+  </style>
+</head>
+<body>
+  <div class="contenedor">
+    <h1>Mis Registros</h1>
+    <p class="subtitulo">Conectado a mi API en Render</p>
+
+    <div class="caja-formulario">
+      <input type="text" id="nombre" placeholder="Nombre del registro" required>
+      <textarea id="descripcion" rows="3" placeholder="Descripción (opcional)"></textarea>
+      <button onclick="guardarRegistro()">Agregar registro</button>
+    </div>
+
+    <h3>Guardados</h3>
+    <div id="lista">Cargando datos...</div>
+  </div>
+
+  <script>
+    const API_URL = 'https://onrender.com';
+
+    // Cargar los datos al abrir la página (GET)
+    async function cargarRegistros() {
+      const lista = document.getElementById('lista');
+      try {
+        const respuesta = await fetch(API_URL);
+        const resultado = await respuesta.json();
+        lista.innerHTML = '';
+
+        resultado.data.forEach(item => {
+          lista.innerHTML += `
+            <div class="tarjeta">
+              <h3>${item.nombre}</h3>
+              <p>${item.descripcion || ''}</p>
+            </div>
+          `;
+        });
+      } catch (error) {
+        lista.innerHTML = '<p>Error al conectar con la API.</p>';
+      }
+    }
+
+    // Enviar un nuevo dato (POST)
+    async function guardarRegistro() {
+      const nombre = document.getElementById('nombre').value;
+      const descripcion = document.getElementById('descripcion').value;
+      if (!nombre) return alert('Escribe un nombre');
+
+      await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nombre, descripcion })
+      });
+
+      document.getElementById('nombre').value = '';
+      document.getElementById('descripcion').value = '';
+      cargarRegistros();
+    }
+
+    cargarRegistros();
+  </script>
+</body>
+</html>
